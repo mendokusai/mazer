@@ -31,7 +31,8 @@ defmodule Mazer.Grid do
 
     List.flatten([output], list)
     |> Enum.each(&(IO.puts(&1)))
-    "c'est une maze"
+    # "c'est une maze"
+    grid
   end
 
   defp build_row(row, grid), do: build_row(row, grid, "\|")
@@ -43,7 +44,7 @@ defmodule Mazer.Grid do
                     else
                       "|"
                     end
-    updated_collection = collection <> "   " <> east_boundary
+    updated_collection = collection <> " #{Cell.contents_of(cell)} " <> east_boundary
     build_row(remainder, grid, updated_collection)
   end
 
@@ -73,6 +74,16 @@ defmodule Mazer.Grid do
     row = Enum.random(1..grid.rows)
     col = Enum.random(1..grid.columns)
     get_cell(grid, row, col)
+  end
+
+  def find_cell(grid, cell_name) do
+    ~r/row-(?<row>\d)_col-(?<col>\d)/
+    |> Regex.named_captures(cell_name)
+    |> coerce_cells(grid)
+  end
+
+  defp coerce_cells(%{"col" => col, "row" => row}, grid) do
+    get_cell(grid, String.to_integer(row), String.to_integer(col))
   end
 
   def get_cell(%{grid: grid}, row, col) do
